@@ -1,0 +1,212 @@
+[
+  {
+    "id": "sagrada",
+    "title": "Sagrada Fam\u00edlia",
+    "clue": "Count the towers that look like honey-dripped spires.",
+    "lat": 41.40363,
+    "lon": 2.17436,
+    "radiusMeters": 120,
+    "points": 10,
+    "labelsAnyOf": [
+      "church",
+      "cathedral",
+      "tower"
+    ],
+    "tier": "A"
+  },
+  {
+    "id": "batllo",
+    "title": "Casa Batll\u00f3",
+    "clue": "Find the house with dragon scales on its roof.",
+    "lat": 41.39165,
+    "lon": 2.16487,
+    "radiusMeters": 120,
+    "points": 10,
+    "labelsAnyOf": [
+      "building",
+      "bench"
+    ],
+    "tier": "A"
+  },
+  {
+    "id": "boqueria",
+    "title": "La Boqueria entrance",
+    "clue": "Follow your nose to the rainbow of fruit.",
+    "lat": 41.38285,
+    "lon": 2.17199,
+    "radiusMeters": 100,
+    "points": 8,
+    "labelsAnyOf": [
+      "food",
+      "banana",
+      "orange"
+    ],
+    "tier": "A"
+  },
+  {
+    "id": "arc",
+    "title": "Arc de Triomf",
+    "clue": "Pass beneath the red-brick arch that welcomes fairs.",
+    "lat": 41.39102,
+    "lon": 2.18005,
+    "radiusMeters": 120,
+    "points": 8,
+    "labelsAnyOf": [
+      "arch",
+      "bench"
+    ],
+    "tier": "A"
+  },
+  {
+    "id": "barceloneta",
+    "title": "Barceloneta Beach (W Hotel)",
+    "clue": "A sail of glass rises by the sand.",
+    "lat": 41.36944,
+    "lon": 2.19059,
+    "radiusMeters": 150,
+    "points": 8,
+    "labelsAnyOf": [
+      "surfboard",
+      "person",
+      "umbrella"
+    ],
+    "tier": "A"
+  },
+  {
+    "id": "parcguell",
+    "title": "Parc G\u00fcell - El Drac",
+    "clue": "Meet the mosaic guardian at the stairs.",
+    "lat": 41.41449,
+    "lon": 2.1527,
+    "radiusMeters": 120,
+    "points": 12,
+    "labelsAnyOf": [
+      "lizard",
+      "bench"
+    ],
+    "tier": "B"
+  },
+  {
+    "id": "santpau",
+    "title": "Hospital de Sant Pau",
+    "clue": "A city of art nouveau within a hospital\u2019s walls.",
+    "lat": 41.41354,
+    "lon": 2.17431,
+    "radiusMeters": 120,
+    "points": 9,
+    "labelsAnyOf": [
+      "building"
+    ],
+    "tier": "B"
+  },
+  {
+    "id": "palau",
+    "title": "Palau de la M\u00fasica Catalana",
+    "clue": "Columns of flowers sing without a sound.",
+    "lat": 41.38702,
+    "lon": 2.17539,
+    "radiusMeters": 90,
+    "points": 10,
+    "labelsAnyOf": [
+      "column",
+      "flower"
+    ],
+    "tier": "B"
+  },
+  {
+    "id": "macba",
+    "title": "MACBA square",
+    "clue": "Skaters carve lines beside white walls.",
+    "lat": 41.38342,
+    "lon": 2.16686,
+    "radiusMeters": 120,
+    "points": 7,
+    "labelsAnyOf": [
+      "skateboard",
+      "person"
+    ],
+    "tier": "B"
+  },
+  {
+    "id": "bunkers",
+    "title": "Bunkers del Carmel",
+    "clue": "Where the city becomes a sea of rooftops.",
+    "lat": 41.418,
+    "lon": 2.157,
+    "radiusMeters": 180,
+    "points": 10,
+    "labelsAnyOf": [
+      "building"
+    ],
+    "tier": "B"
+  },
+  {
+    "id": "pontbisbe",
+    "title": "Gothic Quarter - Pont del Bisbe",
+    "clue": "A stone bridge whispers between narrow lanes.",
+    "lat": 41.38396,
+    "lon": 2.17621,
+    "radiusMeters": 80,
+    "points": 9,
+    "labelsAnyOf": [
+      "bridge"
+    ],
+    "tier": "C"
+  },
+  {
+    "id": "plareial",
+    "title": "Pla\u00e7a Reial",
+    "clue": "Palm trees, lamps by Gaud\u00ed, and late-night stories.",
+    "lat": 41.38034,
+    "lon": 2.17567,
+    "radiusMeters": 100,
+    "points": 7,
+    "labelsAnyOf": [
+      "palm",
+      "person"
+    ],
+    "tier": "C"
+  },
+  {
+    "id": "fountain",
+    "title": "Montju\u00efc Magic Fountain",
+    "clue": "Where water dances with light at night.",
+    "lat": 41.37126,
+    "lon": 2.15128,
+    "radiusMeters": 180,
+    "points": 8,
+    "labelsAnyOf": [
+      "fountain",
+      "person"
+    ],
+    "tier": "C"
+  },
+  {
+    "id": "campnou",
+    "title": "Spotify Camp Nou (exterior)",
+    "clue": "Where blaugrana chants echo.",
+    "lat": 41.3809,
+    "lon": 2.12282,
+    "radiusMeters": 220,
+    "points": 10,
+    "labelsAnyOf": [
+      "stadium",
+      "person"
+    ],
+    "tier": "C"
+  },
+  {
+    "id": "tibidabo",
+    "title": "Tibidabo - Sagrat Cor",
+    "clue": "A church above a ferris wheel in the clouds.",
+    "lat": 41.42183,
+    "lon": 2.11805,
+    "radiusMeters": 220,
+    "points": 12,
+    "labelsAnyOf": [
+      "church",
+      "cross"
+    ],
+    "tier": "C"
+  }
+]

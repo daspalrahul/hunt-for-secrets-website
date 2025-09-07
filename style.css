@@ -1,0 +1,89 @@
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans',sans-serif;line-height:1.5;margin:0;background:#0b1220;color:#e6f0ff}
+header,footer{padding:12px 16px;background:#0f172a;color:#e2e8f0;position:sticky;top:0;z-index:10}
+footer{position:static;bottom:auto}
+h1{margin:0;font-weight:700}
+main{padding:16px;max-width:800px;margin:0 auto}
+section{margin:16px 0;background:#0d1b2a;border:1px solid #1e293b;border-radius:12px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+label{display:block;margin-bottom:8px}
+select,input,button{font:inherit;margin:6px 0;padding:10px;border-radius:10px;border:1px solid #334155;background:#0b1626;color:#e6f0ff}
+button{cursor:pointer}
+.hint{margin:8px 0;padding:10px;border-radius:10px;background:#10223b}
+.result{margin-top:10px;padding:10px;border-radius:10px;background:#0f2238;min-height:32px}
+.capture{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#status{background:#0e1f35;border:1px solid #1b2a41;border-radius:10px;padding:8px}
+details{background:#0e1f35;padding:8px;border-radius:10px}
+a{color:#7dd3fc}
+
+
+/* Splash screen */
+.splash{position:fixed;inset:0;background:rgba(11,18,32,.9);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:999}
+.splash-card{max-width:520px;text-align:center;background:rgba(13,27,42,.85);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 16px 60px rgba(0,0,0,.35)}
+.splash-icon{width:72px;height:72px;margin-bottom:10px}
+.splash-badges{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.muted{color:var(--muted)}
+
+
+/* How-to carousel */
+.howto{margin:14px 0}
+.slides{display:grid;grid-auto-flow:column;grid-auto-columns:100%;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:rgba(11,22,38,.6)}
+.slide{padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:150px}
+.howto-ic{width:48px;height:48px;opacity:.9}
+.dots{display:flex;justify-content:center;gap:8px;margin-top:8px}
+.dots .dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--border);background:#0b1626;cursor:pointer}
+.dots .dot.active{background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+
+/* Actions row above capture */
+.actions-row{display:flex;justify-content:flex-end}
+#showOnMap{margin-top:6px}
+
+/* Leaflet pin coloring by tier */
+.leaflet-marker-icon.pinA div{background:linear-gradient(180deg,#22c55e,#16a34a)!important}
+.leaflet-marker-icon.pinB div{background:linear-gradient(180deg,#f59e0b,#d97706)!important}
+.leaflet-marker-icon.pinC div{background:linear-gradient(180deg,#ef4444,#dc2626)!important}
+
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal[hidden]{display:none}
+.modal-card{max-width:560px;width:92vw;background:rgba(13,27,42,.95);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.5)}
+
+/* Mobile-first touch targets */
+button, .file, select{min-height:44px}
+@media (max-width: 600px){
+  .scoregrid{grid-template-columns:1fr}
+  .hero{padding:14px}
+  .card{padding:14px}
+}
+
+/* Prevent layout jumps */
+img, canvas{max-width:100%;height:auto}
+
+/* Banner */
+.banner{position:sticky;top:0;z-index:20;background:#0b1b32;color:#cfe6ff;padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:center;border-bottom:1px solid var(--border)}
+.banner a{color:#7dd3fc;text-decoration:underline}
+.banner button{margin-left:auto;background:transparent;border:none;color:#cfe6ff;font-size:16px;cursor:pointer}
+
+/* Filters */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;align-items:center}
+.filters input[type="search"]{flex:1;min-width:180px;background:#0b1626;color:var(--text);border:1px solid var(--border);padding:10px;border-radius:12px}
+.chipset{display:flex;gap:10px;flex-wrap:wrap}
+.chipset label{background:#0b1626;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
+
+/* Nearby list */
+#nearbyList{margin:10px 0 0 0;padding-left:18px}
+#nearbyList li{margin:4px 0}
+
+/* Warm/cold meter */
+.meter{height:10px;border-radius:999px;background:#0b1626;border:1px solid var(--border);overflow:hidden;margin-top:8px}
+.meter > div{height:100%;width:0%}
+
+/* High contrast */
+:root.high-contrast{
+  --bg:#000; --card:#000; --muted:#aaa; --text:#fff; --brand:#fff; --brand-2:#ccc; --border:#666;
+}
+:root.high-contrast .card, :root.high-contrast .hero, :root.high-contrast .status{box-shadow:none;border-color:#666}
+:root.high-contrast .primary{background:#fff;color:#000}
+
+#photoPreview{background:#0b1626}
+
+#verifyQuickLink{background:rgba(14,165,233,.15);border:1px solid var(--border);padding:4px 8px;border-radius:8px;font-size:12px}
