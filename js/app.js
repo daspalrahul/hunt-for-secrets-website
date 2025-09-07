@@ -1,7 +1,29 @@
 /* Client-only treasure hunt app */
+
+// Safe localStorage helpers
+function safeGet(key) {
+  try { return localStorage.getItem(key); }
+  catch (e) { console.warn('localStorage.getItem failed', e); return null; }
+}
+function safeSet(key, val) {
+  try { localStorage.setItem(key, val); }
+  catch (e) { console.warn('localStorage.setItem failed', e); }
+}
+function safeRemove(key) {
+  try { localStorage.removeItem(key); }
+  catch (e) { console.warn('localStorage.removeItem failed', e); }
+}
+
+let savedProgress = {};
+try {
+  savedProgress = JSON.parse(safeGet('progress') || '{}');
+} catch (e) {
+  console.warn('Failed to read progress from storage', e);
+}
+
 const state = {
   locations: [],
-  progress: JSON.parse(localStorage.getItem('progress')||'{}'), // {id:{done:boolean, points:number, ts:number, method:string, distance:number}}
+  progress: savedProgress, // {id:{done:boolean, points:number, ts:number, method:string, distance:number}}
   model: null,
   usingDetector: true
 };
@@ -152,7 +174,7 @@ async function validateSelected(){
     const bonus = objectOk ? Math.ceil(basePoints*0.3) : 0;
     const total = basePoints + bonus;
     state.progress[id] = { done:true, points: total, ts: Date.now(), method, distance: Math.round(dist), objectOk };
-    localStorage.setItem('progress', JSON.stringify(state.progress));
+    safeSet('progress', JSON.stringify(state.progress));
     $('result').innerHTML = `✅ Nice! Within ${Math.round(dist)} m (${method}). +${basePoints} pts${bonus?` + ${bonus} bonus`:''}.`;
   } else {
     $('result').textContent = `❌ Not quite. You are ${Math.round(dist)} m away (need <= ${loc.radiusMeters} m).`;
@@ -177,7 +199,7 @@ function renderScore(){
 function resetProgress(){
   if (!confirm('Reset local progress?')) return;
   state.progress = {};
-  localStorage.removeItem('progress');
+  safeRemove('progress');
   renderScore();
   for (const opt of $('clueSelect').options) {
     opt.textContent = state.locations.find(l=>l.id===opt.value).title;
@@ -191,14 +213,22 @@ window.addEventListener('load', load);
 // --- Splash screen logic ---
 function setupSplash(){
   const key = 'bcn-splash-dismissed';
-  const dismissed = localStorage.getItem(key) === '1';
+  const dismissed = safeGet(key) === '1';
   const el = document.getElementById('splash');
-  const start = document.getElementById('startBtn');
   if (!el) return;
   if (dismissed) { el.style.display = 'none'; return; }
+  const start = document.getElementById('startBtn');
+  if (!start) {
+    console.warn('#startBtn not found; hiding splash');
+    el.style.display = 'none';
+    return;
+  }
   start.addEventListener('click', ()=>{
     el.style.opacity = '0';
-    setTimeout(()=>{ el.style.display = 'none'; localStorage.setItem(key,'1'); }, 200);
+    setTimeout(()=>{
+      el.style.display = 'none';
+      safeSet(key,'1');
+    }, 200);
   });
 }
 
@@ -331,7 +361,7 @@ renderClue = function(){
 }
 
 // --- Persistence: already using localStorage; add periodic flush safeguard
-setInterval(()=>{ try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch{} }, 5000);
+setInterval(()=>{ safeSet('progress', JSON.stringify(state.progress)); }, 5000);
 
 // --- Completion detection
 function checkCompletion(){
@@ -344,49 +374,35 @@ function checkCompletion(){
 
 // Hook: after successful validation, also check completion
 const _validateSelected = validateSelected;
+validateSelected = async function(){
+  await _validateSelected();
+  checkCompletion();
+};
+
 document.getElementById('shareCard').onclick = async () => {
-    try{
-      const blob = await new Promise(res => document.getElementById('cardCanvas').toBlob(res, 'image/png'));
-      const file = new File([blob], 'bcn-hunt-completion.png', {type:'image/png'});
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files:[file], title:'Hunt for Secrets', text:'I completed the Barcelona treasure hunt!' });
-      } else {
-        // fallback to download if Web Share is not available
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'bcn-hunt-completion.png'; a.click();
-        URL.revokeObjectURL(url);
-      }
-    } catch(e){
-      console.warn('Share failed', e);
+  try{
+    const blob = await new Promise(res => document.getElementById('cardCanvas').toBlob(res, 'image/png'));
+    const file = new File([blob], 'bcn-hunt-completion.png', {type:'image/png'});
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files:[file], title:'Hunt for Secrets', text:'I completed the Barcelona treasure hunt!' });
+    } else {
+      // fallback to download if Web Share is not available
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'bcn-hunt-completion.png'; a.click();
+      URL.revokeObjectURL(url);
     }
-  };
-}
+  } catch(e){
+    console.warn('Share failed', e);
+  }
+};
 
 // Ensure we check completion on load (resume state)
 window.addEventListener('load', ()=> setTimeout(checkCompletion, 400));
 
-try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch {}
-    $('result').className = 'result ok';
-    const bonusText = bonus ? (' + ' + bonus + ' bonus') : '';
-    $('result').innerHTML = '✅ Nice! Within ' + Math.round(dist) + ' m (' + method + '). +' + basePoints + ' pts' + bonusText + '.';
-    confettiBurst();
-  } else {
-    $('result').className = 'result err';
-    $('result').textContent = '❌ Not quite. You are ' + Math.round(dist) + ' m away (need <= ' + loc.radiusMeters + ' m).';
-  }
-
-  for (const opt of $('clueSelect').options) {
-    const done = state.progress[opt.value]?.done;
-    opt.textContent = (done ? '✅ ' : '') + state.locations.find(l=>l.id===opt.value).title;
-  }
-  renderScore();
-  checkCompletion();
-};
-
 // --- Install prompt nudge after 2 sessions
 (function(){
-  const k='bcn-sessions'; let n = parseInt(localStorage.getItem(k)||'0',10)+1; localStorage.setItem(k, String(n));
+  const k='bcn-sessions'; let n = parseInt(safeGet(k)||'0',10)+1; safeSet(k, String(n));
   if (n>=2){
     const btn = document.getElementById('installBtn');
     if (btn) btn.hidden = false;
@@ -395,11 +411,11 @@ try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch 
 
 // --- First launch banner wiring
 (function(){
-  const key='bcn-first-launch'; const seen = localStorage.getItem(key)==='1';
+  const key='bcn-first-launch'; const seen = safeGet(key)==='1';
   const b = document.getElementById('firstLaunchBanner');
   if (!b) return;
   if (!seen){ b.hidden = false; }
-  document.getElementById('closeBanner').onclick = ()=>{ b.hidden = true; localStorage.setItem(key,'1'); };
+  document.getElementById('closeBanner').onclick = ()=>{ b.hidden = true; safeSet(key,'1'); };
   document.getElementById('openPrivacyFromBanner').onclick = (e)=>{
     e.preventDefault();
     const modal = document.getElementById('privacyModal'); if (modal) modal.hidden = false;
@@ -411,13 +427,13 @@ try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch 
   const bs = document.getElementById('batterySaverToggle');
   const hc = document.getElementById('highContrastToggle');
   const bsKey='bcn-battery-saver', hcKey='bcn-high-contrast';
-  const savedBs = localStorage.getItem(bsKey)==='1';
-  const savedHc = localStorage.getItem(hcKey)==='1';
+  const savedBs = safeGet(bsKey)==='1';
+  const savedHc = safeGet(hcKey)==='1';
   if (bs){ bs.checked = savedBs; }
   if (hc){ hc.checked = savedHc; if (savedHc) document.documentElement.classList.add('high-contrast'); }
-  if (bs) bs.addEventListener('change', ()=>{ localStorage.setItem(bsKey, bs.checked?'1':'0'); });
+  if (bs) bs.addEventListener('change', ()=>{ safeSet(bsKey, bs.checked?'1':'0'); });
   if (hc) hc.addEventListener('change', ()=>{
-    localStorage.setItem(hcKey, hc.checked?'1':'0');
+    safeSet(hcKey, hc.checked?'1':'0');
     document.documentElement.classList.toggle('high-contrast', hc.checked);
   });
 })();
@@ -438,7 +454,7 @@ try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch 
       try {
         const text = await f.text();
         const data = JSON.parse(text);
-        if (typeof data === 'object'){ state.progress = data; localStorage.setItem('progress', JSON.stringify(state.progress)); renderScore(); }
+        if (typeof data === 'object'){ state.progress = data; safeSet('progress', JSON.stringify(state.progress)); renderScore(); }
       } catch(e){ alert('Invalid file'); }
     };
     inp.click();
@@ -454,7 +470,7 @@ try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch 
     try {
       const keepKeys = ['bcn-first-launch']; // keep banner state
       const all = Object.keys(localStorage);
-      for (const k of all){ if (!keepKeys.includes(k)) localStorage.removeItem(k); }
+      for (const k of all){ if (!keepKeys.includes(k)) safeRemove(k); }
     } catch {}
     state.progress = {};
     renderScore();
@@ -525,7 +541,7 @@ function warmCold(distance, radius){
 // --- Battery-aware: skip object detection when saver enabled or battery low
 (async function(){
   try {
-    const bsOn = localStorage.getItem('bcn-battery-saver')==='1';
+    const bsOn = safeGet('bcn-battery-saver')==='1';
     if (bsOn){ state.usingDetector = false; return; }
     if (navigator.getBattery){
       const b = await navigator.getBattery();
@@ -824,7 +840,7 @@ validateSelected = async function(){
     const bonus = objectOk ? Math.ceil(basePoints * 0.3) : 0;
     const total = basePoints + bonus;
     state.progress[id] = { done: true, points: total, ts: Date.now(), method, distance: Math.round(dist), objectOk };
-    try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch {}
+    safeSet('progress', JSON.stringify(state.progress));
     $('result').className = 'result ok';
     var bonusText = objectOk ? (' + ' + bonus + ' bonus') : '';
     $('result').innerHTML = '✅ Nice! Within ' + Math.round(dist) + ' m (' + method + '). +' + basePoints + ' pts' + bonusText + '.';
