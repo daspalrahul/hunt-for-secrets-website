@@ -1,0 +1,16 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 2rem;
+}
+
+.question {
+  margin-bottom: 1.5rem;
+}
+
+.result {
+  margin-left: 1rem;
+}
+
+#score {
+  font-weight: bold;
+}
