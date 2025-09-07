@@ -19,7 +19,6 @@ A privacy‑first, **static** treasure hunt you can deploy on GitHub Pages. Solv
 - **Completion code**: Offline, checksum‑protected code for bragging rights and peer verification.
 - **Nearby**: Show clues within 500m.
 - **Search & filters**: Find clues; filter by tier and completion status.
-- **Installable PWA**: Works offline; install prompt nudge after 2 sessions.
 - **Accessibility**: High‑contrast mode, mobile‑first layout, large touch targets.
 - **Data control**: Backup/restore progress JSON; reset all local data.
 - **Privacy & Permissions**: Clear in‑app page + just‑in‑time rationale dialogs.
@@ -40,8 +39,6 @@ A privacy‑first, **static** treasure hunt you can deploy on GitHub Pages. Solv
 │   ├── bg.svg
 │   ├── logo.png
 │   └── icons/{map.svg,camera.svg,trophy.svg}
-├── manifest.json              # PWA manifest
-├── sw.js                      # Service worker (cache static assets for offline)
 ├── PRIVACY.md                 # Privacy & permissions policy
 ├── LICENSE                    # Restrictive license (permission required for reuse)
 └── .github/workflows/pages.yml# GitHub Pages deploy
@@ -79,7 +76,7 @@ A privacy‑first, **static** treasure hunt you can deploy on GitHub Pages. Solv
 ## 🚀 Running & Publishing
 
 ### Local run
-Open `index.html` in a modern browser. For best results (service worker, permissions), use a static file server:
+Open `index.html` in a modern browser. For best results (permissions), use a static file server:
 ```bash
 # any of these work
 python3 -m http.server 8080
@@ -126,7 +123,7 @@ Each entry:
 - **Permissions are requested only when needed**:
   - **Location**: at validation time to compute distance; fallback to EXIF if denied.
   - **Camera/Photos**: only when you choose a photo.
-  - **Storage**: `localStorage` for progress; Service Worker caches static files for offline.
+  - **Storage**: `localStorage` for progress.
 - See **`PRIVACY.md`** for the full policy.
 
 ---
@@ -143,7 +140,6 @@ Each entry:
 
 - **Location fails**: ensure device GPS is on, grant permission, or include EXIF GPS in your photo.  
 - **Object detection slow**: enable **Battery Saver** (disables detection) or rely on geofence only.  
-- **Offline issues**: hard refresh may be serving cached assets; try “Empty cache and hard reload” once after updating.
 
 ---
 

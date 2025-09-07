@@ -31,19 +31,6 @@ const state = {
 function $(id){ return document.getElementById(id); }
 
 async function load() {
-  // PWA install prompt
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const btn = $('installBtn');
-    btn.hidden = false;
-    btn.onclick = async () => {
-      btn.hidden = true;
-      await deferredPrompt.prompt();
-    };
-  });
-
   // Load locations
   const res = await fetch('data/locations.json');
   state.locations = await res.json();
@@ -55,7 +42,7 @@ async function load() {
     const opt = document.createElement('option');
     opt.value = loc.id;
     const done = state.progress[loc.id]?.done;
-    opt.textContent = `${done ? '✅ ' : ''}${loc.title}`;
+    opt.textContent = `${done ? '✅ ' : ''}${loc.clue}`;
     sel.appendChild(opt);
   }
   sel.onchange = () => renderClue();
@@ -73,11 +60,6 @@ async function load() {
     state.usingDetector = false;
   }
 
-  // Service worker
-  if ('serviceWorker' in navigator) {
-    try { await navigator.serviceWorker.register('sw.js'); } catch {}
-  }
-
   renderScore();
 }
 
@@ -86,7 +68,7 @@ function renderClue() {
   const loc = state.locations.find(l => l.id === id);
   $('clueHint').textContent = loc?.clue || '';
   $('result').textContent = '';
-  debug(`Selected: ${loc.title}`);
+  debug(`Selected clue: ${loc?.clue || ''}`);
 }
 
 function haversineMeters(aLat,aLon,bLat,bLon){
@@ -183,7 +165,7 @@ async function validateSelected(){
   // Update UI
   for (const opt of $('clueSelect').options) {
     const done = state.progress[opt.value]?.done;
-    opt.textContent = `${done ? '✅ ' : ''}${state.locations.find(l=>l.id===opt.value).title}`;
+    opt.textContent = `${done ? '✅ ' : ''}${state.locations.find(l=>l.id===opt.value).clue}`;
   }
   renderScore();
 }
@@ -202,7 +184,7 @@ function resetProgress(){
   safeRemove('progress');
   renderScore();
   for (const opt of $('clueSelect').options) {
-    opt.textContent = state.locations.find(l=>l.id===opt.value).title;
+    opt.textContent = state.locations.find(l=>l.id===opt.value).clue;
   }
   $('result').textContent = '';
   $('photoInput').value = '';
@@ -261,7 +243,7 @@ async function initMap(){
     const lon = loc.lon + jitter(0.0012);
     const m = L.marker([lat,lon], { icon }).addTo(markersLayer);
     const done = state.progress[loc.id]?.done;
-    m.bindPopup(`<strong>${done?'✅ ':''}${loc.title}</strong><br><em>${loc.clue}</em>`);
+    m.bindPopup(`${done ? '✅ ' : ''}${loc.clue}`);
   });
 }
 
@@ -334,7 +316,7 @@ initMap = async function(){
     });
     const m = L.marker([lat,lon], { icon }).addTo(markersLayer);
     const done = state.progress[loc.id]?.done;
-    m.bindPopup(`<strong>${done?'✅ ':''}${loc.title}</strong><br><em>${loc.clue}</em><br><small>Tier ${loc.tier}</small>`);
+    m.bindPopup(`${done ? '✅ ' : ''}${loc.clue}<br><small>Tier ${loc.tier}</small>`);
     markerIndex[loc.id] = { lat, lon, marker: m };
   });
 }
@@ -399,15 +381,6 @@ document.getElementById('shareCard').onclick = async () => {
 
 // Ensure we check completion on load (resume state)
 window.addEventListener('load', ()=> setTimeout(checkCompletion, 400));
-
-// --- Install prompt nudge after 2 sessions
-(function(){
-  const k='bcn-sessions'; let n = parseInt(safeGet(k)||'0',10)+1; safeSet(k, String(n));
-  if (n>=2){
-    const btn = document.getElementById('installBtn');
-    if (btn) btn.hidden = false;
-  }
-})();
 
 // --- First launch banner wiring
 (function(){
@@ -492,11 +465,11 @@ window.addEventListener('load', ()=> setTimeout(checkCompletion, 400));
       if (!showDone && done) continue;
       const tier = loc.tier || 'B';
       if ((tier==='A' && !showA) || (tier==='B' && !showB) || (tier==='C' && !showC)) continue;
-      const text = (loc.title + ' ' + (loc.clue||'')).toLowerCase();
+      const text = (loc.clue||'').toLowerCase();
       if (q && !text.includes(q)) continue;
       const opt = document.createElement('option');
       opt.value = loc.id;
-      opt.textContent = `${done ? '✅ ' : ''}${loc.title}`;
+      opt.textContent = `${done ? '✅ ' : ''}${loc.clue}`;
       sel.appendChild(opt);
     }
     renderClue();
@@ -518,7 +491,7 @@ document.getElementById('findNearby')?.addEventListener('click', async ()=>{
     if (list.length===0){ ul.innerHTML = '<li>No nearby clues found.</li>'; return; }
     for (const {l,d} of list){
       const li = document.createElement('li');
-      li.innerHTML = `<a href="#">${l.title}</a> — ${Math.round(d)} m`;
+      li.innerHTML = `<a href="#">${l.clue}</a> — ${Math.round(d)} m`;
       li.querySelector('a').addEventListener('click', (e)=>{ e.preventDefault(); document.getElementById('clueSelect').value = l.id; renderClue(); centerSelected(); });
       ul.appendChild(li);
     }
@@ -873,8 +846,8 @@ validateSelected = async function(){
   for (let i=0;i<sel.options.length;i++){
     const opt = sel.options[i];
     const done = !!(state.progress[opt.value] && state.progress[opt.value].done);
-    const locTitle = (state.locations.find(l=>l.id===opt.value) || {}).title || opt.value;
-    opt.textContent = (done ? '✅ ' : '') + locTitle;
+    const locClue = (state.locations.find(l=>l.id===opt.value) || {}).clue || opt.value;
+    opt.textContent = (done ? '✅ ' : '') + locClue;
   }
 
   renderScore();
