@@ -1,2 +1,0 @@
-✅ Single validateSelected definition after cleanup.
-✅ Backtick count is balanced.
